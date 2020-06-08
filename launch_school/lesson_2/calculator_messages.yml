@@ -1,9 +1,0 @@
-
-welcome: "Welcome to Calculator! Enter your name:"
-valid_name: "Make sure to use a valid name"
-first_num: "Whats the first number?"
-second_num: "Whats the second number?"
-invalid_num: "Hmm.. that doesn't look like a valid number"
-invalid_operator: "Must choose 1, 2, 3, 4"
-another_calc: "Do you want to perform another calculation? (Y to calculate again)"
-goodbye: "Thank you for using the calculator! Good bye!"
