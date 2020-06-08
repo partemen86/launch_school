@@ -16,10 +16,8 @@ end
 
 def determine_winner(player, computer)
   if win?(player, computer)
-    @player_score += 1
     "You won!"
   elsif win?(computer, player)
-    @computer_score += 1
     "Computer won!"
   else
     "Its a tie!"
@@ -27,9 +25,8 @@ def determine_winner(player, computer)
 end
 
 loop do
-  prompt("First to 5 wins is the winner!")
-  @player_score = 0
-  @computer_score = 0
+  prompt("Welcome to Rock Paper Scissors! First to 5 wins is the winner!")
+  game_scores = { player: 0, computer: 0 }
 
   loop do
     choice_short = ''
@@ -48,22 +45,27 @@ loop do
 
     player_choice   = VALID_CHOICES[choice_short]
     computer_choice = VALID_CHOICES.values.sample
-    # computer_choice_long = VALID_CHOICES[computer_choice_short]
 
     prompt("You chose: #{player_choice}; Computer chose #{computer_choice}")
 
-    prompt(determine_winner(player_choice, computer_choice))
+    round_result = determine_winner(player_choice, computer_choice)
+    if round_result == "You won!"
+      game_scores[:player] += 1
+    elsif round_result == "Computer won!"
+      game_scores[:computer] += 1
+    end
+    prompt(round_result)
 
-    if @player_score >= 5
+    if game_scores[:player] >= 5
       prompt("You win the game! Final score is: \
-      #{@player_score} to #{@computer_score}")
+      #{game_scores[:player]} to #{game_scores[:computer]}")
       break
-    elsif @computer_score >= 5
+    elsif game_scores[:computer] >= 5
       prompt("You lose the game! Final score is: \
-      #{@player_score} to #{@computer_score}")
+      #{game_scores[:player]} to #{game_scores[:computer]}")
       break
     end
-    prompt("Score is: #{@player_score} to #{@computer_score}")
+    prompt("Score is: #{game_scores[:player]} to #{game_scores[:computer]}")
   end
 
   prompt("Do you want to play again?")
