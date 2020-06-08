@@ -44,7 +44,7 @@ loop do
         prompt("That is not a valid choice.")
       end
     end
-
+ 
     player_choice   = VALID_CHOICES[choice_short]
     computer_choice = VALID_CHOICES.values.sample
     # computer_choice_long = VALID_CHOICES[computer_choice_short]
