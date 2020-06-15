@@ -47,13 +47,13 @@ end
 def stay?
   answer = ''
   loop do
-    prompt "Do you want to hit or stay?"
+    prompt "Do you want to hit(h) or stay(s)?"
     answer = gets.chomp.downcase
-    break if answer == 'hit' || answer == 'stay'
-    prompt "That is not a valid choice."
+    break if answer == 'h' || answer == 's'
+    prompt "That is not a valid choice. Please enter 'h' or 's'."
   end
 
-  answer == 'stay'
+  answer == 's'
 end
 
 def return_card_values(hand)
@@ -88,6 +88,7 @@ end
 loop do
   # initializing
   system 'clear'
+  prompt "Welcome to Twenty-One!"
   current_deck  = initialize_deck
   computer_hand = initialize_hand(current_deck)
   player_hand   = initialize_hand(current_deck)
@@ -112,7 +113,7 @@ and #{player_hand[1][1]} of #{player_hand[1][0]}"
   # if player busts, the game is over
   if bust?(player_hand)
     prompt "You bust! Dealer wins!"
-  # if player did not bust, computer turn  
+  # if player did not bust, computer turn
   else
     prompt "Dealer shows his hand"
     prompt "Dealer has #{computer_hand[0][1]} of #{computer_hand[0][0]} \
@@ -133,17 +134,22 @@ and #{computer_hand[1][1]} of #{computer_hand[1][0]}."
     end
 
     computer_score = add_values(computer_hand)
-    prompt bust?(computer_hand) ? "Dealer busts! You win!" : "Dealer stays."
-
-    if player_score > computer_score
-      prompt "You win!"
-    elsif player_score == computer_score
-      prompt "It's a tie!"
+    if bust?(computer_hand)
+      prompt "Dealer busts! You win!"
     else
-      prompt "Dealer wins!"
+      prompt "Dealer stays."
+      if player_score > computer_score
+        prompt "You win!"
+      elsif player_score == computer_score
+        prompt "It's a tie!"
+      else
+        prompt "Dealer wins!"
+      end
     end
   end
 
   display_final_score(player_score, computer_score)
   break unless play_again?
 end
+
+prompt "Thank you for playing!"
