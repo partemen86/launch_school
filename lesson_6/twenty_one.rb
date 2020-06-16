@@ -1,3 +1,8 @@
+MAX_SCORE = 21
+DEALER_STAYS_AT = 17
+SUITS = ['Diamonds', 'Spades', 'Hearts', 'Clubs']
+VALUES = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'Jack', 'Queen', 'King', 'Ace']
+
 def prompt(str)
   puts "=> #{str}"
 end
@@ -24,12 +29,17 @@ def play_again?
 end
 
 def initialize_deck
-  {
-    Diamonds: [2, 3, 4, 5, 6, 7, 8, 9, 10, 'Jack', 'Queen', 'King', 'Ace'],
-    Spades:   [2, 3, 4, 5, 6, 7, 8, 9, 10, 'Jack', 'Queen', 'King', 'Ace'],
-    Hearts:   [2, 3, 4, 5, 6, 7, 8, 9, 10, 'Jack', 'Queen', 'King', 'Ace'],
-    Clubs:    [2, 3, 4, 5, 6, 7, 8, 9, 10, 'Jack', 'Queen', 'King', 'Ace']
-  }
+  deck = {}
+  SUITS.map do |suit|
+    deck[suit] = VALUES.dup
+  end
+  deck
+  # {
+  #   Diamonds: VALUES.dup,
+  #   Spades:   VALUES.dup,
+  #   Hearts:   VALUES.dup,
+  #   Clubs:    VALUES.dup
+  # }
 end
 
 def draw_card(deck)
@@ -76,13 +86,13 @@ def add_values(hand)
     end
   end
   card_values.select { |value| value == 'Ace' }.count.times do
-    total -= 10 if total > 21
+    total -= 10 if total > MAX_SCORE
   end
   total
 end
 
 def bust?(hand)
-  add_values(hand) > 21
+  add_values(hand) > MAX_SCORE
 end
 
 loop do
@@ -122,7 +132,7 @@ and #{computer_hand[1][1]} of #{computer_hand[1][0]}."
     prompt "Enter any key to continue"
     gets
     loop do
-      break if bust?(computer_hand) || add_values(computer_hand) >= 17
+      break if bust?(computer_hand) || add_values(computer_hand) >= DEALER_STAYS_AT
       prompt "Dealer hits."
       new_card = draw_card(current_deck)
       prompt "Dealer was dealt #{new_card[1]} of #{new_card[0]}."
@@ -147,7 +157,7 @@ and #{computer_hand[1][1]} of #{computer_hand[1][0]}."
       end
     end
   end
-
+p current_deck
   display_final_score(player_score, computer_score)
   break unless play_again?
 end
