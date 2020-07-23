@@ -1,5 +1,4 @@
 class Participant
-  MAX_SCORE = 21
 
   attr_accessor :hand
   def initialize
@@ -24,13 +23,13 @@ class Participant
       end
     end
     @hand.select { |card| card.value == 'Ace' }.count.times do
-      total -= 10 if total > MAX_SCORE
+      total -= 10 if total > Game::MAX_SCORE
     end
     total
   end
 
   def busted?
-    determine_score > MAX_SCORE
+    determine_score > Game::MAX_SCORE
   end
 end
 
@@ -60,7 +59,7 @@ class Deck
 end
 
 class Card
-  attr_accessor :suit, :value
+  attr_reader :suit, :value
 
   def initialize(suit, value)
     @suit = suit
@@ -73,6 +72,8 @@ class Card
 end
 
 class Game
+  MAX_SCORE = 21
+  DEALER_HIT_UNTIL = 17
   def initialize
     @player = Player.new
     @dealer = Dealer.new
@@ -130,17 +131,15 @@ class Game
   def dealer_turn
     puts "Dealer shows his hand:"
     show_dealer_hand
-    if @player.busted?
-      puts "You busted! Dealer wins!"
-    elsif @dealer.determine_score >= 17
+    if @player.busted? || @dealer.determine_score >= DEALER_HIT_UNTIL
       puts "Dealer stays"
-    elsif @dealer.determine_score < 17
+    elsif @dealer.determine_score < DEALER_HIT_UNTIL
       dealer_hits
     end
   end
 
   def dealer_hits
-    until @dealer.determine_score >= 17
+    until @dealer.determine_score >= DEALER_HIT_UNTIL
       puts "Dealer hits"
       sleep 2
       hit(@dealer)
@@ -150,7 +149,9 @@ class Game
   end
 
   def show_result
-    if @dealer.busted?
+    if @player.busted?
+      puts "You busted! Dealer wins!"
+    elsif @dealer.busted?
       puts "Dealer busted! You win!"
     elsif @dealer.determine_score > @player.determine_score
       puts "Dealer has the higher score! You lose!"
