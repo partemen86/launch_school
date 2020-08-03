@@ -43,7 +43,7 @@ class Player < Participant
     loop do
       puts "What is your name?"
       name = gets.chomp
-      break unless name.empty?
+      break unless name.strip.empty?
       puts "Sorry must enter a name"
     end
     name.capitalize
