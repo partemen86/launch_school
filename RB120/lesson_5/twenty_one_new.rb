@@ -185,12 +185,18 @@ class Game
       puts "#{player.name} busted! #{dealer.name} wins!"
     elsif dealer.busted?
       puts "#{dealer.name} busted! #{player.name} wins!"
-    elsif @dealer.determine_score > @player.determine_score
-      puts "#{dealer.name} has the higher score! #{player.name} loses!"
-    elsif dealer.determine_score == player.determine_score
-      puts "Its a tie!"
     else
+      display_winner_by_score
+    end
+  end
+
+  def display_winner_by_score
+    if @dealer.determine_score > @player.determine_score
+      puts "#{dealer.name} has the higher score! #{player.name} loses!"
+    elsif @player.determine_score > @dealer.determine_score
       puts "#{player.name} has the higher score! #{player.name} wins!"
+    else
+      puts "Its a tie!"
     end
   end
 
