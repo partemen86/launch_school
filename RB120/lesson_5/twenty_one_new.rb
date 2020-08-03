@@ -1,5 +1,4 @@
 class Participant
-
   attr_accessor :hand
   def initialize
     @hand = []
@@ -16,13 +15,13 @@ class Participant
   def determine_score
     total = 0
     @hand.each do |card|
-      case card.value
-      when (2..10) then total += card.value
+      case card.rank
+      when (2..10) then total += card.rank
       when 'Jack', 'Queen', 'King' then total += 10
       when 'Ace' then total += 11
       end
     end
-    @hand.select { |card| card.value == 'Ace' }.count.times do
+    @hand.select { |card| card.rank == 'Ace' }.count.times do
       total -= 10 if total > Game::MAX_SCORE
     end
     total
@@ -34,20 +33,40 @@ class Participant
 end
 
 class Player < Participant
+  attr_reader :name
+  def initialize
+    @name = get_player_name
+  end
+
+  def get_player_name
+    name = ''
+    loop do
+      puts "What is your name?"
+      name = gets.chomp
+      break unless name.empty?
+      puts "Sorry must enter a name"
+    end
+    name.capitalize
+  end
 end
 
 class Dealer < Participant
+  DEALER_NAMES = %w(Number1 Number7 Sparky)
+  attr_reader :name
+  def initialize
+    @name = DEALER_NAMES.sample
+  end
 end
 
 class Deck
   SUITS = %w(Hearts Spades Clubs Diamonds)
-  CARD_VALUES = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'Jack', 'Queen', 'King', 'Ace']
+  CARD_RANKS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'Jack', 'Queen', 'King', 'Ace']
 
   def initialize
     @deck = []
     SUITS.each do |suit|
-      CARD_VALUES.each do |value|
-        @deck << Card.new(suit, value)
+      CARD_RANKS.each do |rank|
+        @deck << Card.new(suit, rank)
       end
     end
     @deck.shuffle!
@@ -59,19 +78,21 @@ class Deck
 end
 
 class Card
-  attr_reader :suit, :value
+  attr_reader :suit, :rank
 
-  def initialize(suit, value)
+  def initialize(suit, rank)
     @suit = suit
-    @value = value
+    @rank = rank
   end
 
   def to_s
-    "#{@value} of #{@suit}"
+    "#{@rank} of #{@suit}"
   end
 end
 
 class Game
+  attr_reader :player, :dealer
+  attr_accessor :deck
   MAX_SCORE = 21
   DEALER_HIT_UNTIL = 17
   def initialize
@@ -81,6 +102,12 @@ class Game
   end
 
   def start
+    puts "Welcome to 21!"
+    play_game
+    puts "Thank you for playing 21!"
+  end
+
+  def play_game
     loop do
       reset
       clear
@@ -91,7 +118,6 @@ class Game
       show_result
       break unless play_again?
     end
-    puts "Thank you for playing 21!"
   end
 
   def clear
@@ -99,80 +125,83 @@ class Game
   end
 
   def deal_cards
-    2.times { hit(@player) }
-    2.times { hit(@dealer) }
+    2.times { hit(player) }
+    2.times { hit(dealer) }
   end
 
   def hit(player)
-    player.hand << @deck.draw_card
+    player.hand << deck.draw_card
   end
 
   def show_cards
-    show_player_hand
-    puts "Dealer has #{@dealer.hand[0]} and an unknown card"
+    show_hand(player)
+    puts "#{dealer.name} has #{dealer.hand[0]} and an unknown card"
   end
 
   def player_turn
     loop do
-      answer = ''
-      loop do
-        puts "Do you wish to (h)it or (s)tay?"
-        answer = gets.chomp
-        break if answer.downcase == 'h' || answer.downcase == 's'
-        puts "Sorry, that is not a valid choice."
-      end
+      answer = hit_or_stay
       clear
-      hit(@player) if answer == 'h'
-      show_player_hand
-      break if answer == 's' || @player.busted?
+      hit(player) if answer == 'h'
+      show_hand(player)
+      puts "#{dealer.name} has #{dealer.hand[0]} and an unknown card"
+      break if answer == 's' || player.busted?
     end
   end
 
+  def hit_or_stay
+    answer = ''
+    loop do
+      puts "Do you wish to (h)it or (s)tay?"
+      answer = gets.chomp
+      break if answer.downcase == 'h' || answer.downcase == 's'
+      puts "Sorry, that is not a valid choice."
+    end
+    answer
+  end
+
   def dealer_turn
-    puts "Dealer shows his hand:"
-    show_dealer_hand
-    if @player.busted? || @dealer.determine_score >= DEALER_HIT_UNTIL
-      puts "Dealer stays"
-    elsif @dealer.determine_score < DEALER_HIT_UNTIL
+    puts "#{dealer.name} shows his hand:"
+    show_hand(dealer)
+    if player.busted? || dealer.determine_score >= DEALER_HIT_UNTIL
+      puts "#{dealer.name} stays"
+    elsif dealer.determine_score < DEALER_HIT_UNTIL
       dealer_hits
     end
   end
 
   def dealer_hits
-    until @dealer.determine_score >= DEALER_HIT_UNTIL
-      puts "Dealer hits"
+    until dealer.determine_score >= DEALER_HIT_UNTIL
+      puts "#{dealer.name} hits"
       sleep 2
-      hit(@dealer)
-      show_dealer_hand
+      hit(dealer)
+      show_hand(dealer)
     end
-    puts "Dealer stays" if @dealer.determine_score < 22
+    puts "#{dealer.name} stays" if dealer.determine_score < 22
   end
 
   def show_result
-    if @player.busted?
-      puts "You busted! Dealer wins!"
-    elsif @dealer.busted?
-      puts "Dealer busted! You win!"
+    if player.busted?
+      puts "#{player.name} busted! #{dealer.name} wins!"
+    elsif dealer.busted?
+      puts "#{dealer.name} busted! #{player.name} wins!"
     elsif @dealer.determine_score > @player.determine_score
-      puts "Dealer has the higher score! You lose!"
-    elsif @dealer.determine_score == @player.determine_score
+      puts "#{dealer.name} has the higher score! #{player.name} loses!"
+    elsif dealer.determine_score == player.determine_score
       puts "Its a tie!"
     else
-      puts "You have the higher score! You win!"
+      puts "#{player.name} has the higher score! #{player.name} wins!"
     end
   end
 
-  def show_player_hand
-    puts "You have #{@player.return_hand} for a score of #{@player.determine_score}"
-  end
-
-  def show_dealer_hand
-    puts "Dealer has #{@dealer.return_hand} for a score of: #{@dealer.determine_score}"
+  def show_hand(person)
+    puts "#{person.name} has #{person.return_hand} for a score of #{person.determine_score}"
   end
 
   def play_again?
     answer = ''
     loop do
+      puts ''
       puts "Would you like to play again? (y/n)"
       answer = gets.chomp.downcase
       break if ['y', 'n'].include? answer
@@ -182,9 +211,9 @@ class Game
   end
 
   def reset
-    @deck = Deck.new
-    @player.reset
-    @dealer.reset
+    self.deck = Deck.new
+    player.reset
+    dealer.reset
   end
 end
 
