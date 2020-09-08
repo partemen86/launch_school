@@ -1,5 +1,6 @@
 class Participant
   attr_accessor :hand
+
   def initialize
     @hand = []
   end
@@ -21,6 +22,11 @@ class Participant
       when 'Ace' then total += 11
       end
     end
+    correct_for_aces(total)
+  end
+
+  def correct_for_aces(score)
+    total = score
     @hand.select { |card| card.rank == 'Ace' }.count.times do
       total -= 10 if total > Game::MAX_SCORE
     end
@@ -52,7 +58,9 @@ end
 
 class Dealer < Participant
   DEALER_NAMES = %w(Number1 Number7 Sparky)
+
   attr_reader :name
+  
   def initialize
     @name = DEALER_NAMES.sample
   end
@@ -63,6 +71,10 @@ class Deck
   CARD_RANKS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'Jack', 'Queen', 'King', 'Ace']
 
   def initialize
+    reset_deck
+  end
+
+  def reset_deck
     @deck = []
     SUITS.each do |suit|
       CARD_RANKS.each do |rank|
@@ -93,8 +105,10 @@ end
 class Game
   attr_reader :player, :dealer
   attr_accessor :deck
+
   MAX_SCORE = 21
   DEALER_HIT_UNTIL = 17
+
   def initialize
     @player = Player.new
     @dealer = Dealer.new
@@ -103,11 +117,11 @@ class Game
 
   def start
     puts "Welcome to 21!"
-    play_game
+    play
     puts "Thank you for playing 21!"
   end
 
-  def play_game
+  def play
     loop do
       reset
       clear
@@ -119,6 +133,8 @@ class Game
       break unless play_again?
     end
   end
+
+  private
 
   def clear
     system 'clear'
@@ -157,7 +173,7 @@ class Game
       break if answer.downcase == 'h' || answer.downcase == 's'
       puts "Sorry, that is not a valid choice."
     end
-    answer
+    answer.downcase
   end
 
   def dealer_turn
@@ -201,7 +217,8 @@ class Game
   end
 
   def show_hand(person)
-    puts "#{person.name} has #{person.return_hand} for a score of #{person.determine_score}"
+    puts "#{person.name} has #{person.return_hand} for" \
+    "a score of #{person.determine_score}"
   end
 
   def play_again?

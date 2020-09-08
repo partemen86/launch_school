@@ -151,8 +151,8 @@ class RPSGame
   end
 
   def play
+    display_welcome_message
     loop do
-      display_welcome_message
       loop do
         system("clear")
         human.choose
