@@ -6,9 +6,9 @@
 
 # Step One
 
-# To begin with, convert a simple binary font to a string containing 
+# To begin with, convert a simple binary font to a string containing
 
-# 0 or 1. The binary font uses pipes and underscores, 
+# 0 or 1. The binary font uses pipes and underscores,
 
 # four rows high and three columns wide.
 
@@ -26,19 +26,19 @@
 
 # If the input is the correct size, but not recognizable,
 
-# your program should return '?'. If the input is the incorrect size, 
+# your program should return '?'. If the input is the incorrect size,
 
 # your program should return an error.
 
 # Step Two
 
-# Update your program to recognize multi-character binary strings, 
+# Update your program to recognize multi-character binary strings,
 
 # replacing garbled numbers with ?
 
 # Step Three
 
-# Update your program to recognize all numbers 0 through 9, both 
+# Update your program to recognize all numbers 0 through 9, both
 
 # individually and as part of a larger string.
 
@@ -56,7 +56,7 @@
 
 # Step Four
 
-# Update your program to handle multiple numbers, one per line. 
+# Update your program to handle multiple numbers, one per line.
 
 # When converting several lines, join the lines with commas.
 
@@ -76,34 +76,27 @@
 
 class OCR
   KEY = {
-    '1' => ' '
+    [" _ ", "| |", "|_|"] => '0', ["   ", "  |", "  |"] => '1',
+    [" _ ", " _|", "|_ "] => '2', [" _ ", " _|", " _|"] => '3',
+    ["   ", "|_|", "  |"] => '4', [" _ ", "|_ ", " _|"] => '5',
+    [" _ ", "|_ ", "|_|"] => '6', [" _ ", "  |", "  |"] => '7',
+    [" _ ", "|_|", "|_|"] => '8', [" _ ", "|_|", " _|"] => '9'
   }
+
+  attr_reader :str
 
   def initialize(str)
     @str = str
   end
 
   def convert
-    answer = ''
-    array = @str.split("\n")
-    raise ArgumentError, "wrong size" unless array.size == 3
-    num_characters = (array[1].size / 3.0).ceil
-    p num_characters
-    if array[0] == ''
-      return '1'
-    end
+    str.split("\n\n").map { |row| convert_row(row) }.join(',')
   end
 
-
-  
+  def convert_row(string)
+    string_array = string.split("\n")
+    max_size = string_array.max_by(&:size).size
+    string_rows = string_array.map { |line| line.ljust(max_size).scan(/.{3}/) }
+    string_rows.transpose.map { |ocr_digit| KEY[ocr_digit] || '?' }.join
+  end
 end
-
-text = <<-NUMBER.chomp
-
-| |
-| |
-
-    NUMBER
-
-test = OCR.new(text)
-test.convert
