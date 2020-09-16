@@ -88,9 +88,9 @@ class Game
 
   def filler_ball(score)
     add_strikes(score)
-    if @spare.size == 2 # spare
+    if @spare.size == 2 # spare, just one fill ball
       @score += (10 + score)
-    else # strike
+    else # strike, 2 fill balls
       check_pin_count_legal(score)
       @spare << score unless score == 10
     end
