@@ -93,4 +93,13 @@ class PhraseTest < Minitest::Test
     }
     assert_equal counts, phrase.word_count
   end
+
+  def test_ending_apostrophe
+    phrase = Phrase.new("Joe can't tell between Joe's and Joes'")
+    counts = {
+      'joe' => 1, "can't" => 1, 'tell' => 1,
+      'between' => 1, "joe's" => 1, "joes'" => 1, 'and' => 1
+    }
+    assert_equal counts, phrase.word_count
+  end
 end
