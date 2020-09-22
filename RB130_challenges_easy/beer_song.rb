@@ -1,5 +1,7 @@
-class BeerSong
+# Write a program that can generate the lyrics of the 99 Bottles of Beer song.
+# See the test suite for the entire song.
 
+class BeerSong
   def verse(int)
     if int == 2
       "2 bottles of beer on the wall, 2 bottles of beer.\n"  \
@@ -16,16 +18,15 @@ class BeerSong
     end
   end
 
-  def verses(start,finish)
-    x = ''
+  def verses(start, finish)
+    result = ''
     start.downto(finish) do |num|
-      x += verse(num) + "\n"
+      result += verse(num) + "\n"
     end
-    x.chomp
+    result.chomp
   end
 
   def lyrics
     verses(99, 0)
   end
 end
-
