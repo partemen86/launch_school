@@ -1,0 +1,35 @@
+<body>
+  <script>
+
+  function rotate(letter, numPlaces, upper = true) {
+    let newPosition = (letter.charCodeAt() + numPlaces);
+    let startPosition;
+    if (upper) {
+      startPosition = 'A'.charCodeAt();
+    } else {
+      startPosition = 'a'.charCodeAt();
+    }
+    return (String.fromCharCode((newPosition - startPosition) % 26 + startPosition));
+  }
+  
+  function rot13(string) {
+    const NUMBER_OF_PLACES = 13;
+    newString = '';
+    for (let index = 0; index < string.length; index ++) {
+      let currentLetter = string[index];
+      if (currentLetter >= 'A' && currentLetter <= 'Z') {
+        newString += rotate(currentLetter, NUMBER_OF_PLACES);
+      } else if (currentLetter >= 'a' && currentLetter <= 'z') {
+        newString += rotate(currentLetter, NUMBER_OF_PLACES, false);
+      } else {
+        newString += currentLetter;
+      }
+    }
+    
+    return newString;
+  }
+
+  console.log(rot13('Teachers open the door, but you must enter by yourself.'));
+  console.log(rot13(rot13('Teachers open the door, but you must enter by yourself.')));
+  </script>
+</body> 
